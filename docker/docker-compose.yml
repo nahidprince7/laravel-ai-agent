@@ -1,0 +1,75 @@
+name: laravelai
+services:
+  # PHP App
+  app:
+    build:
+      context: .
+      dockerfile: php/Dockerfile
+    container_name: la-app
+    volumes:
+      - ../Source:/var/www
+    networks:
+      - la-network
+
+  # Node.js (Vite)
+  node:
+    build:
+      context: .
+      dockerfile: node/Dockerfile
+    container_name: la-node
+    ports:
+      - "5173:5173"
+    volumes:
+      - ../Source:/var/www
+    networks:
+      - la-network
+
+  # Nginx
+  nginx:
+    image: nginx:alpine
+    container_name: la-nginx
+    ports:
+      - "8000:80"
+    volumes:
+      - ../Source:/var/www
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - app
+      - node
+    networks:
+      - la-network
+
+  # MySQL
+  mysql:
+    image: mysql:8.4
+    container_name: la-db
+    environment:
+      MYSQL_DATABASE: laravel
+      MYSQL_ROOT_PASSWORD: root
+    ports:
+      - "3306:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+    networks:
+      - la-network
+
+  # phpMyAdmin
+  phpmyadmin:
+    image: phpmyadmin:latest
+    container_name: la-pma
+    links:
+      - mysql
+    environment:
+      PMA_HOST: mysql
+      PMA_PORT: 3306
+    ports:
+      - "8080:80"
+    networks:
+      - la-network
+
+networks:
+  la-network:
+    driver: bridge
+
+volumes:
+  db_data:
