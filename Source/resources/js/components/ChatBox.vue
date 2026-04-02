@@ -55,6 +55,47 @@ onMounted(() => {
 // UTILITY FUNCTIONS
 // ============================================
 
+const sendMessage = async (): Promise<void> => {
+  if (!newMessage.value.trim()) return
+
+  // Add user message (keep your existing code)
+  const userMessage: Message = {
+    id: Date.now(),
+    text: newMessage.value.trim(),
+    sender: 'user',
+    timestamp: new Date()
+  }
+  messages.value.push(userMessage)
+  const messageText = newMessage.value.trim()
+  newMessage.value = ''
+  scrollToBottom()
+
+  // Show typing indicator
+  isTyping.value = true
+  scrollToBottom()
+
+  // Call your Laravel route
+  const response = await fetch('/ai-agent', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
+    },
+    body: JSON.stringify({ message: messageText })
+  })
+  const data = await response.json()
+  isTyping.value = false
+
+  messages.value.push({
+    id: Date.now() + 1,
+    text: data.reply,   // make sure your controller returns { reply: '...' }
+    sender: 'support',
+    timestamp: new Date()
+  })
+  scrollToBottom()
+}
+
+
 const formatTime = (date: Date): string => {
   return date.toLocaleTimeString('en-US', {
     hour: '2-digit',
@@ -86,37 +127,7 @@ const closeChat = (): void => {
   isOpen.value = false
 }
 
-const sendMessage = (): void => {
-  if (!newMessage.value.trim()) return
 
-  // Add user message
-  const userMessage: Message = {
-    id: Date.now(),
-    text: newMessage.value.trim(),
-    sender: 'user',
-    timestamp: new Date()
-  }
-  messages.value.push(userMessage)
-  newMessage.value = ''
-  scrollToBottom()
-
-  // Simulate typing indicator
-  isTyping.value = true
-  scrollToBottom()
-
-  // Simulate support response after delay
-  setTimeout(() => {
-    isTyping.value = false
-    const supportMessage: Message = {
-      id: Date.now() + 1,
-      text: 'Thanks for your message! Our team will get back to you shortly.',
-      sender: 'support',
-      timestamp: new Date()
-    }
-    messages.value.push(supportMessage)
-    scrollToBottom()
-  }, 1500)
-}
 
 const handleKeyPress = (event: KeyboardEvent): void => {
   if (event.key === 'Enter' && !event.shiftKey) {
