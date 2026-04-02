@@ -19,12 +19,19 @@
 2. Make sure your `vite.config.js` has the correct server config for Docker:
    ```js
    server: {
-       host: '0.0.0.0',
-       port: 5173,
-       hmr: {
-           host: 'localhost',
-       },
-   }
+        host: '0.0.0.0',
+        port: 5173,
+        hmr: {
+            host: 'localhost',
+        },
+        strictPort: false,
+        //for windows polling 
+        watch: {
+            usePolling: true,
+            interval: 100,
+            ignored: ['**/node_modules/**', '**/vendor/**'],
+        },
+    },
    ```
 
 3. From the `docker/` directory, run:
