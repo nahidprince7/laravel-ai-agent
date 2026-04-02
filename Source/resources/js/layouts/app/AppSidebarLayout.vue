@@ -24,7 +24,5 @@ withDefaults(defineProps<Props>(), {
             <slot />
         </AppContent>
     </AppShell>
-
-    <!-- Floating Chatbox Widget -->
-<!--    <ChatBox />-->
+    <ChatBox />
 </template>

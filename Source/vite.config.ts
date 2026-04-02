@@ -29,7 +29,7 @@ export default defineConfig({
         strictPort: false,
         watch: {
             usePolling: true,
-            interval: 100,
+            // interval: 100,
             ignored: ['**/node_modules/**', '**/vendor/**'],
         },
     },
