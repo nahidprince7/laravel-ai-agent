@@ -26,6 +26,9 @@ class ListOrderToolForUser implements Tool
 
     public function schema(JsonSchema $schema): array
     {
-        return [];
+        // only for groq
+        return [
+        'placeholder' => $schema->string(),
+        ];
     }
 }

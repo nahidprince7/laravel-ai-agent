@@ -18,7 +18,9 @@ class OrderSeeder extends Seeder
             return;
         }
 
-        for ($i = 0; $i < 8; $i++) {
+        $statuses = ['ordered', 'cancelled', 'completed'];
+
+        for ($i = 0; $i < 30; $i++) {
             $user = $users->random();
             $product = $products->random();
             $qty = rand(1, 5);
@@ -28,6 +30,7 @@ class OrderSeeder extends Seeder
                 'user_id' => $user->id,
                 'product_id' => $product->id,
                 'qty' => $qty,
+                'status' => $statuses[array_rand($statuses)],
             ]);
         }
     }

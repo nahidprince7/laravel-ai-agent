@@ -2,19 +2,20 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Order extends Model
 {
-    use HasFactory;
+    use SoftDeletes;
 
     protected $fillable = [
         'invoice_id',
         'user_id',
         'product_id',
         'qty',
+        'status',
     ];
 
     protected $casts = [
@@ -29,5 +30,14 @@ class Order extends Model
     public function product(): BelongsTo
     {
         return $this->belongsTo(Product::class);
+    }
+    
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($order) {
+            $order->invoice_id = 'INV-' . strtoupper(uniqid());
+        });
     }
 }

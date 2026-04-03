@@ -17,7 +17,9 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
             $table->foreignId('product_id')->constrained()->cascadeOnDelete();
             $table->unsignedInteger('qty');
+            $table->enum('status', ['ordered', 'cancelled', 'completed'])->default('ordered');
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 
