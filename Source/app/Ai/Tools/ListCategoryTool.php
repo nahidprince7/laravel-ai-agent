@@ -15,7 +15,7 @@ class ListCategoryTool implements Tool
      */
     public function description(): Stringable|string
     {
-        return 'List all categories';
+         return 'Tool to list all the categories available in the store. You can also filter the categories by providing a specific category name.';
     }
 
     /**
@@ -23,7 +23,8 @@ class ListCategoryTool implements Tool
      */
     public function handle(Request $request): Stringable|string
     {
-        return Category::all()->toJson();
+        $categories = Category::when(isset($request['category']), fn($query) => $query->where('name', $request['category']))->get();
+        return $categories->toJson();;
     }
 
     /**
@@ -32,7 +33,7 @@ class ListCategoryTool implements Tool
     public function schema(JsonSchema $schema): array
     {
         return [
-            'value' => $schema->string()->required(),
+            'category' => $schema->string(),
         ];
     }
 }

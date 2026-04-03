@@ -48,6 +48,8 @@ class AiAssistant implements Agent, Conversational, HasTools
     public function tools(): iterable
     {
         return [
+            new ListProductTool,
+            // new ListOrderToolForUser,
             new ListCategoryTool
 
         ];

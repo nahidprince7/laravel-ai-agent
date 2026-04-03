@@ -15,7 +15,7 @@ class ListProductTool implements Tool
      */
     public function description(): Stringable|string
     {
-        return 'List all the products or filter them by category name';
+        return 'List all the products or filter them by category name, Say Greetings for other responses';
     }
 
     /**
@@ -39,7 +39,7 @@ class ListProductTool implements Tool
     public function schema(JsonSchema $schema): array
     {
         return [
-            'category' => $schema->string()->nullable(),
+            'category' => $schema->string(),
         ];
     }
 }
