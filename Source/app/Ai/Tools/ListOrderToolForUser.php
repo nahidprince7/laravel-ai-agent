@@ -2,6 +2,8 @@
 
 namespace App\Ai\Tools;
 
+use App\Models\Order;
+use App\Models\User;
 use Illuminate\Contracts\JsonSchema\JsonSchema;
 use Laravel\Ai\Contracts\Tool;
 use Laravel\Ai\Tools\Request;
@@ -9,29 +11,21 @@ use Stringable;
 
 class ListOrderToolForUser implements Tool
 {
-    /**
-     * Get the description of the tool's purpose.
-     */
+    public function __construct(public User $user) {}
+
     public function description(): Stringable|string
     {
         return 'List orders for the current user';
     }
 
-    /**
-     * Execute the tool.
-     */
     public function handle(Request $request): Stringable|string
     {
-        return '[]';
+        $orders = Order::where('user_id', $this->user->id)->with('product')->get();
+        return $orders->toJson();
     }
 
-    /**
-     * Get the tool's schema definition.
-     */
     public function schema(JsonSchema $schema): array
     {
-        return [
-            'value' => $schema->string()->required(),
-        ];
+        return [];
     }
 }
