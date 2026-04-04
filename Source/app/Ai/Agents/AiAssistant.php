@@ -5,7 +5,10 @@ namespace App\Ai\Agents;
 use App\Ai\Tools\ListCategoryTool;
 use App\Ai\Tools\ListOrderToolForUser;
 use App\Ai\Tools\ListProductTool;
+use App\Ai\Tools\CancelOrderTool;
+use App\Ai\Tools\CreateOrderTool;
 use App\Models\User;
+use GuzzleHttp\Promise\Create;
 use Laravel\Ai\Contracts\Agent;
 use Laravel\Ai\Contracts\Conversational;
 use Laravel\Ai\Contracts\HasTools;
@@ -27,7 +30,13 @@ class AiAssistant implements Agent, Conversational, HasTools
      */
     public function instructions(): Stringable|string
     {
-        return 'You are a helpful ai assistant. You will provide ,category & order information';
+        return 'You are a helpful ai assistant. You will provide category & order information.';
+    // IMPORTANT FORMATTING RULES:
+    // - Never use tables or markdown tables
+    // - Never use | characters
+    // - Show each order on separate lines like this:
+    //   Order(Invoice Number): Product Name - Qty: 3 - Price: $79.99
+    // - Use simple bullet points or numbered lists only';
     }
 
     /**
@@ -48,7 +57,12 @@ class AiAssistant implements Agent, Conversational, HasTools
     public function tools(): iterable
     {
         return [
-            new ListCategoryTool
+            new ListProductTool,
+            new ListCategoryTool,
+            new ListOrderToolForUser($this->user),
+            new CancelOrderTool($this->user),
+            new CreateOrderTool($this->user),
+
 
         ];
     }

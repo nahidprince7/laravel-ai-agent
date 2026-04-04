@@ -4,38 +4,33 @@ namespace Database\Seeders;
 
 use App\Models\Order;
 use App\Models\Product;
+use App\Models\User;
 use Illuminate\Database\Seeder;
 
 class OrderSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
-        // Create 8 orders with random products
-        for ($i = 0; $i < 8; $i++) {
-            // Get random products for the order (2-3 products)
-            $products = Product::inRandomOrder()->take(rand(2, 3))->get();
+        $users = User::all();
+        $products = Product::all();
 
-            $items = [];
-            $totalAmount = 0;
+        if ($users->isEmpty() || $products->isEmpty()) {
+            return;
+        }
 
-            foreach ($products as $product) {
-                $quantity = rand(1, 3);
-                $items[] = [
-                    'product_id' => $product->id,
-                    'name' => $product->name,
-                    'price' => $product->price,
-                    'quantity' => $quantity,
-                ];
-                $totalAmount += $product->price * $quantity;
-            }
+        $statuses = ['ordered', 'cancelled', 'completed'];
+
+        for ($i = 0; $i < 30; $i++) {
+            $user = $users->random();
+            $product = $products->random();
+            $qty = rand(1, 5);
 
             Order::create([
-                'items' => $items,
-                'total_amount' => $totalAmount,
-                'status' => ['pending', 'completed', 'cancelled'][rand(0, 2)],
+                'invoice_id' => 'INV-' . strtoupper(uniqid()),
+                'user_id' => $user->id,
+                'product_id' => $product->id,
+                'qty' => $qty,
+                'status' => $statuses[array_rand($statuses)],
             ]);
         }
     }

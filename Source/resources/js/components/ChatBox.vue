@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, nextTick, onMounted, watch } from 'vue'
-
+import { marked } from 'marked'
 // ============================================
 // TYPES & INTERFACES
 // ============================================
@@ -23,6 +23,10 @@ const messagesContainer = ref<HTMLElement | null>(null)
 const isTyping = ref(false)
 const unreadCount = ref(1)
 
+const parseMarkdown = (text: string): string => {
+  return marked.parse(text) as string
+}
+
 // ============================================
 // DUMMY DATA INITIALIZATION
 // ============================================
@@ -35,18 +39,6 @@ onMounted(() => {
       text: 'Hello! How can I help you today?',
       sender: 'support',
       timestamp: new Date(Date.now() - 300000) // 5 minutes ago
-    },
-    {
-      id: 2,
-      text: 'Hi! I have a question about my account.',
-      sender: 'user',
-      timestamp: new Date(Date.now() - 240000) // 4 minutes ago
-    },
-    {
-      id: 3,
-      text: 'Of course! I\'d be happy to help. What would you like to know?',
-      sender: 'support',
-      timestamp: new Date(Date.now() - 180000) // 3 minutes ago
     }
   ]
 })
@@ -278,7 +270,11 @@ watch(messages, () => {
                   : 'bg-white text-gray-800 rounded-bl-md border border-gray-200'
               "
             >
-              <p class="text-sm leading-relaxed">{{ message.text }}</p>
+              <div
+                class="text-sm leading-relaxed"
+                :class="message.sender === 'support' ? 'prose prose-sm max-w-none' : ''"
+                v-html="message.sender === 'support' ? parseMarkdown(message.text) : message.text"
+              ></div>
             </div>
 
             <!-- Timestamp -->
@@ -398,5 +394,32 @@ watch(messages, () => {
 
 .overflow-y-auto::-webkit-scrollbar-thumb:hover {
   background: #94a3b8;
+}
+
+/* chat message beutification */
+.prose h3 { font-weight: 600; margin: 8px 0 4px; }
+.prose h3:first-child { margin-top: 0; }
+.prose ul { list-style: disc; padding-left: 16px; }
+.prose li { margin-bottom: 2px; }
+.prose strong { font-weight: 600; }
+
+.prose table {
+    width: 100%;
+    font-size: 11px;
+    border-collapse: collapse;
+    display: block;
+    overflow-x: auto;
+}
+
+.prose th,
+.prose td {
+    padding: 4px 6px;
+    border: 1px solid #e5e7eb;
+    white-space: nowrap;
+}
+
+.prose th {
+    background: #f9fafb;
+    font-weight: 600;
 }
 </style>
